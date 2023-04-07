@@ -55,8 +55,6 @@ body {
 /* Tabela */
 .divTable {
   padding: 10px;
-  display: inline flex;
-  text-align: center;
   width: auto; 
   height: inherit; 
   overflow: auto;
@@ -90,7 +88,7 @@ tr {
 tbody tr td {
   vertical-align: text-top;
   padding: 6px;
-  max-width: 80px;
+  max-width: 50px;
 }
 
 thead tr th {
