@@ -155,3 +155,8 @@ tbody tr td.acao {
   left: 0;
  
 }
+
+.modal{
+  text-align: center;
+  padding: 20px;
+}
