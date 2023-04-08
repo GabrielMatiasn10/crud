@@ -1,96 +1,112 @@
-const modal = document.querySelector('.modal-container')
-const tbody = document.querySelector('tbody')
-const sNome = document.querySelector('#m-nome')
-const sFuncao = document.querySelector('#m-funcao')
-const sSalario = document.querySelector('#m-salario')
-const btnSalvar = document.querySelector('#btnSalvar')
+const modal = document.querySelector('.modal-container');
+const tbody = document.querySelector('tbody');
+const sNome = document.querySelector('#m-nome');
+const sFuncao = document.querySelector('#m-funcao');
+const sSalario = document.querySelector('#m-salario');
+const btnSalvar = document.querySelector('#btnSalvar');
+const handleModalClick = document.querySelector('handleModalClick')
 
-let itens
-let id
+let itens = [];
+let id;
 
 function openModal(edit = false, index = 0) {
-  modal.classList.add('active')
+  modal.classList.add('active');
 
   modal.onclick = e => {
-    if (e.target.className.indexOf('modal-container') !== -1) {
-      modal.classList.remove('active')
+    if (e.target.closest('.modal-container')) {
+      modal.classList.remove('active');
     }
-  }
+  };
 
   if (edit) {
-    sNome.value = itens[index].nome
-    sFuncao.value = itens[index].funcao
-    sSalario.value = itens[index].salario
-    id = index
+    const { nome, funcao, salario } = itens[index];
+    sNome.value = nome;
+    sFuncao.value = funcao;
+    sSalario.value = salario;
+    id = index;
   } else {
-    sNome.value = ''
-    sFuncao.value = ''
-    sSalario.value = ''
+    sNome.value = '';
+    sFuncao.value = '';
+    sSalario.value = '';
   }
-  
 }
 
 function editItem(index) {
-
-  openModal(true, index)
+  openModal(true, index);
 }
 
 function deleteItem(index) {
-  itens.splice(index, 1)
-  setItensBD()
-  loadItens()
+  itens.splice(index, 1);
+  setItensBD();
+  loadItens();
 }
 
 function insertItem(item, index) {
-  let tr = document.createElement('tr')
+  const tr = document.createElement('tr');
+  const { nome, funcao, salario } = item;
 
   tr.innerHTML = `
-    <td>${item.nome}</td>
-    <td>${item.funcao}</td>
-    <td>R$ ${item.salario}</td>
+    <td>${nome}</td>
+    <td>${funcao}</td>
+    <td>R$ ${salario}</td>
     <td class="acao">
-      <button onclick="editItem(${index})"><i class='bx bx-edit' ></i></button>
+      <button data-index="${index}" data-action="edit"><i class='bx bx-edit'></i></button>
     </td>
     <td class="acao">
-      <button onclick="deleteItem(${index})"><i class='bx bx-trash'></i></button>
+      <button data-index="${index}" data-action="delete"><i class='bx bx-trash'></i></button>
     </td>
-  `
-  tbody.appendChild(tr)
+  `;
+
+  tbody.appendChild(tr);
 }
 
-btnSalvar.onclick = e => {
-  
-  if (sNome.value == '' || sFuncao.value == '' || sSalario.value == '') {
-    return
+function saveItem() {
+  if (sNome.value === '' || sFuncao.value === '' || sSalario.value === '') {
+    return;
   }
-
-  e.preventDefault();
 
   if (id !== undefined) {
-    itens[id].nome = sNome.value
-    itens[id].funcao = sFuncao.value
-    itens[id].salario = sSalario.value
+    itens[id].nome = sNome.value;
+    itens[id].funcao = sFuncao.value;
+    itens[id].salario = sSalario.value;
   } else {
-    itens.push({'nome': sNome.value, 'funcao': sFuncao.value, 'salario': sSalario.value})
+    itens.push({ nome: sNome.value, funcao: sFuncao.value, salario: sSalario.value });
   }
 
-  setItensBD()
+  setItensBD();
+  modal.classList.remove('active');
+  loadItens();
+  id = undefined;
+}
 
-  modal.classList.remove('active')
-  loadItens()
-  id = undefined
+function handleTableClick(e) {
+  const button = e.target.closest('button');
+  if (button && button.dataset.action === 'edit') {
+    const index = button.dataset.index;
+    editItem(index);
+  } else if (button && button.dataset.action === 'delete') {
+    const index = button.dataset.index;
+    deleteItem(index);
+  }
 }
 
 function loadItens() {
-  itens = getItensBD()
-  tbody.innerHTML = ''
+  itens = getItensBD();
+  tbody.innerHTML = '';
   itens.forEach((item, index) => {
-    insertItem(item, index)
-  })
-
+    insertItem(item, index);
+  });
 }
 
-const getItensBD = () => JSON.parse(localStorage.getItem('dbfunc')) ?? []
-const setItensBD = () => localStorage.setItem('dbfunc', JSON.stringify(itens))
+function getItensBD() {
+  return JSON.parse(localStorage.getItem('dbfunc')) || [];
+}
 
-loadItens()
+function setItensBD() {
+  localStorage.setItem('dbfunc', JSON.stringify(itens));
+}
+
+loadItens();
+modal.addEventListener('click', handleModalClick);
+btnSalvar.addEventListener('click', saveItem);
+tbody.addEventListener('click', handleTableClick);
