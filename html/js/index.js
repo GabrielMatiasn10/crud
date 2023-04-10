@@ -60,6 +60,15 @@ function insertItem(item, index) {
   tbody.appendChild(tr);
 }
 
+function apagar () {
+  document.getElementById("acao").remove;
+}
+
+function editar() {
+  let novoTexto = prompt("escreva")
+  document.getElementById("texto").innerText = novoTexto;
+}
+
 function saveItem() {
   if (sNome.value === '' || sFuncao.value === '' || sSalario.value === '') {
     return;
